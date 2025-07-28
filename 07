@@ -1,0 +1,17 @@
+const articles = document.querySelectorAll("article");
+const links = document.querySelectorAll("nav.others a");
+for ( el of links ) {
+  el.addEventListener("click", (e)=>{
+    let tgt = 0;
+    for ( let i=0 ; i<articles.length ; i++ ) {
+      articles[i].classList.remove("on");
+      if ( e.target == links[i] ) {
+        tgt = i;
+      }
+    }
+    console.log(tgt);
+    articles[tgt].classList.add("on");
+    document.querySelector("body").className= "";
+    document.querySelector("body").classList.add("member" + (tgt+1));
+  })
+}
