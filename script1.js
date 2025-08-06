@@ -31,7 +31,8 @@ async function getAirportWeather() {
     const AIRPORT_IDS = ["RKSS", "RKSI", "RKNY", "RKTU", "RKPC", "RKPK", "RKJJ", "RKJB"];
     
     // CORS 문제를 해결하기 위한 프록시 서버 URL
-    const CORS_PROXY_URL = "https://api.allorigins.win/raw?url=";
+    // const CORS_PROXY_URL = "https://cors-anywhere.herokuapp.com/"; 
+    // const CORS_PROXY_URL = "https://proxy.cors.sh/";
     
     const weatherDiv = document.getElementById("weatherResult");
     weatherDiv.innerHTML = '<h2>✈️ 국내 주요 공항 기상 정보</h2>';
