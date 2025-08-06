@@ -30,10 +30,10 @@ async function getAirportWeather() {
     const serviceKey = "OEBU5anyrQkL0zi0N1vyjCpBIvoWBYDMB+orxAz7FsyOzDVxU0Bp1YgpSeVnkdfvcbUv2NbRV+O/AEY2mAvD8g==";
     const AIRPORT_IDS = ["RKSS", "RKSI", "RKNY", "RKTU", "RKPC", "RKPK", "RKJJ", "RKJB"];
     
-    // CORS 문제를 해결하기 위한 프록시 서버 URL
-    // const CORS_PROXY_URL = "https://cors-anywhere.herokuapp.com/"; 
-    // const CORS_PROXY_URL = "https://proxy.cors.sh/";
-    
+    // CORS 프록시 서버를 활성화했습니다.
+    // 현재 cors-anywhere 서버는 접속이 불안정할 수 있어 다른 서버로 변경했습니다.
+    const CORS_PROXY_URL = "https://api.allorigins.win/raw?url=";
+
     const weatherDiv = document.getElementById("weatherResult");
     weatherDiv.innerHTML = '<h2>✈️ 국내 주요 공항 기상 정보</h2>';
 
@@ -74,7 +74,6 @@ async function getAirportWeather() {
 
         } catch (error) {
             console.error(`공항 기상 정보를 가져오는 중 오류 발생: ${error}`);
-            // 특정 공항 데이터 로딩 실패 시 표시
             const airportName = airportNames[airportId] || airportId;
             const errorInfo = document.createElement('div');
             errorInfo.className = 'airport-info';
