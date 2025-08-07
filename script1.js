@@ -32,24 +32,26 @@ async function getAirportWeather() {
     
     const CORS_PROXY_URL = "https://cors-anywhere.herokuapp.com/";
     
-    // 현재 날짜와 시간을 구하는 코드
+    // 현재 날짜를 구하는 코드
     const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
 
-    // API가 요구하는 형식에 맞게 날짜와 시간을 만듭니다.
     const base_date = `${year}${month}${day}`;
-    // 시간은 10분 단위로 맞춰줍니다. (예: 10시 5분 -> 10시 00분)
-    const base_time = `${hours}${minutes}`.substring(0, 3) + '0'; 
+    
+    // 현재 시간을 기준으로 API의 발표 시간을 설정
+    let base_time;
+    if (now.getHours() >= 17) {
+        base_time = "1700"; 
+    } else {
+        base_time = "0600"; // 
+    }
 
     const weatherDiv = document.getElementById("weatherResult");
     weatherDiv.innerHTML = '<h2>✈️ 국내 주요 공항 기상 정보</h2>';
 
     for (const airportId of AIRPORT_IDS) {
-        // base_date와 base_time을 API URL에 추가했습니다.
         const apiUrl = `http://apis.data.go.kr/1360000/MdeMdlService/getMdeMdl?serviceKey=${serviceKey}&base_date=${base_date}&base_time=${base_time}&airPortCd=${airportId}`;
         const finalUrl = `${CORS_PROXY_URL}${apiUrl}`; 
         
