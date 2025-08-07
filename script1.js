@@ -1,4 +1,4 @@
-// 날씨 상태에 따라 이모티콘을 반환하는 함수
+    // 날씨 상태에 따라 이모티콘을 반환하는 함수
 function getWeatherEmoji(skyDesc) {
     if (skyDesc.includes("맑음")) {
         return "☀️";
@@ -30,16 +30,14 @@ async function getAirportWeather() {
     const serviceKey = "OEBU5anyrQkL0zi0N1vyjCpBIvoWBYDMB+orxAz7FsyOzDVxU0Bp1YgpSeVnkdfvcbUv2NbRV+O/AEY2mAvD8g==";
     const AIRPORT_IDS = ["RKSS", "RKSI", "RKNY", "RKTU", "RKPC", "RKPK", "RKJJ", "RKJB"];
     
-    const CORS_PROXY_URL = "https://cors-proxy.org/?";
+    const CORS_PROXY_URL = "https://thingproxy.freeboard.io/fetch/";
     
-    // 현재 날짜와 시간을 구하는 코드
     const now = new Date();
     let year = now.getFullYear();
     let month = String(now.getMonth() + 1).padStart(2, '0');
     let day = String(now.getDate()).padStart(2, '0');
     let base_date = `${year}${month}${day}`;
     
-    // 현재 시간을 기준으로 API의 발표 시간을 설정
     let base_time;
     const currentHour = now.getHours();
 
@@ -109,3 +107,4 @@ async function getAirportWeather() {
 }
 
 getAirportWeather();
+
