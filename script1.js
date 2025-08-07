@@ -1,4 +1,4 @@
-    // 날씨 상태에 따라 이모티콘을 반환하는 함수
+// 날씨 상태에 따라 이모티콘을 반환하는 함수
 function getWeatherEmoji(skyDesc) {
     if (skyDesc.includes("맑음")) {
         return "☀️";
@@ -30,8 +30,6 @@ async function getAirportWeather() {
     const serviceKey = "OEBU5anyrQkL0zi0N1vyjCpBIvoWBYDMB+orxAz7FsyOzDVxU0Bp1YgpSeVnkdfvcbUv2NbRV+O/AEY2mAvD8g==";
     const AIRPORT_IDS = ["RKSS", "RKSI", "RKNY", "RKTU", "RKPC", "RKPK", "RKJJ", "RKJB"];
     
-    const CORS_PROXY_URL = "https://thingproxy.freeboard.io/fetch/";
-    
     const now = new Date();
     let year = now.getFullYear();
     let month = String(now.getMonth() + 1).padStart(2, '0');
@@ -58,13 +56,18 @@ async function getAirportWeather() {
     weatherDiv.innerHTML = '<h2>✈️ 국내 주요 공항 기상 정보</h2>';
 
     for (const airportId of AIRPORT_IDS) {
-        const apiUrl = `http://apis.data.go.kr/1360000/MdeMdlService/getMdeMdl?serviceKey=${serviceKey}&base_date=${base_date}&base_time=${base_time}&airPortCd=${airportId}`;
-        const finalUrl = `${CORS_PROXY_URL}${encodeURIComponent(apiUrl)}`;
+        const apiUrl = `http://apis.data.go.kr/1360000/MdeMdlService/getMdeMdl?serviceKey=${encodeURIComponent(serviceKey)}&base_date=${base_date}&base_time=${base_time}&airPortCd=${airportId}`;
+        const finalUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
         
         try {
             const response = await fetch(finalUrl);
-            const xmlText = await response.text();
-            
+            const result = await response.json();
+            const xmlText = result.contents;
+
+            // 로그 출력
+            console.log(`✅ [${airportId}] 호출 성공`);
+            console.log(xmlText);
+
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(xmlText, "text/xml");
             
@@ -89,11 +92,12 @@ async function getAirportWeather() {
                 `;
                 weatherDiv.appendChild(airportInfo);
             } else {
-                console.error(`Error: item not found for ${airportId}`);
+                console.warn(`⚠️ [${airportId}] item 없음`);
+                throw new Error("데이터 없음");
             }
 
         } catch (error) {
-            console.error(`공항 기상 정보를 가져오는 중 오류 발생: ${error}`);
+            console.error(`❌ [${airportId}] 오류 발생:`, error);
             const airportName = airportNames[airportId] || airportId;
             const errorInfo = document.createElement('div');
             errorInfo.className = 'airport-info';
@@ -107,4 +111,6 @@ async function getAirportWeather() {
 }
 
 getAirportWeather();
+
+
 
