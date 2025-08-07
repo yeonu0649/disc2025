@@ -32,20 +32,28 @@ async function getAirportWeather() {
     
     const CORS_PROXY_URL = "https://cors-anywhere.herokuapp.com/";
     
-    // 현재 날짜를 구하는 코드
+    // 현재 날짜와 시간을 구하는 코드
     const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-
-    const base_date = `${year}${month}${day}`;
+    let year = now.getFullYear();
+    let month = String(now.getMonth() + 1).padStart(2, '0');
+    let day = String(now.getDate()).padStart(2, '0');
+    let base_date = `${year}${month}${day}`;
     
     // 현재 시간을 기준으로 API의 발표 시간을 설정
     let base_time;
-    if (now.getHours() >= 17) {
+    const currentHour = now.getHours();
+
+    if (currentHour >= 17) {
         base_time = "1700"; 
+    } else if (currentHour >= 6) {
+        base_time = "0600"; 
     } else {
-        base_time = "0600"; // 
+        now.setDate(now.getDate() - 1); // 날짜를 하루 전으로 변경
+        year = now.getFullYear();
+        month = String(now.getMonth() + 1).padStart(2, '0');
+        day = String(now.getDate()).padStart(2, '0');
+        base_date = `${year}${month}${day}`;
+        base_time = "1700";
     }
 
     const weatherDiv = document.getElementById("weatherResult");
