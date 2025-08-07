@@ -1,0 +1,65 @@
+// 날씨 상태에 따라 이모티콘을 반환하는 함수
+function getWeatherEmoji(skyDesc) {
+    if (skyDesc.includes("맑음")) {
+        return "☀️";
+    } else if (skyDesc.includes("구름 많음") || skyDesc.includes("흐림")) {
+        return "☁️";
+    } else if (skyDesc.includes("비")) {
+        return "☔";
+    } else if (skyDesc.includes("눈")) {
+        return "❄️";
+    } else {
+        return "❓"; // 알 수 없는 날씨
+    }
+}
+
+// 공항 코드를 이름으로 변환하는 맵
+const airportNames = {
+    "RKSS": "김포",
+    "RKSI": "인천",
+    "RKNY": "양양",
+    "RKTU": "청주",
+    "RKPC": "김해",
+    "RKPK": "부산",
+    "RKJJ": "제주",
+    "RKJB": "무안"
+};
+
+// 모든 공항의 날씨를 개별적으로 가져와서 화면에 표시하는 함수
+async function getAirportWeather() {
+
+    const serviceKey = "OEBU5anyrQkL0zi0N1vyjCpBIvoWBYDMB+orxAz7FsyOzDVxU0Bp1YgpSeVnkdfvcbUv2NbRV+O/AEY2mAvD8g==
+";
+    const AIRPORT_IDS = ["RKSS", "RKSI", "RKNY", "RKTU", "RKPC", "RKPK", "RKJJ", "RKJB"];
+    
+    const CORS_PROXY_URL = "https://cors-anywhere.herokuapp.com/";
+    
+    const weatherDiv = document.getElementById("weatherResult");
+    weatherDiv.innerHTML = '<h2>✈️ 국내 주요 공항 기상 정보</h2>';
+
+    for (const airportId of AIRPORT_IDS) {
+        const apiUrl = `http://apis.data.go.kr/1360000/MdeMdlService/getMdeMdl?serviceKey=${serviceKey}&airportId=${airportId}`;
+        const finalUrl = `${CORS_PROXY_URL}${apiUrl}`; // 주의: 이 프록시는 encodeURIComponent가 필요 없습니다.
+        
+        try {
+            const response = await fetch(finalUrl);
+            const xmlText = await response.text();
+            
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+            
+            const item = xmlDoc.querySelector("item");
+            if (item) {
+                const skyDesc = item.querySelector("skyDesc")?.textContent || "N/A";
+                const temp = item.querySelector("temp")?.textContent || "N/A";
+                const windDir = item.querySelector("windDir")?.textContent || "N/A";
+                const windSpd = item.querySelector("windSpd")?.textContent || "N/A";
+
+                const airportName = airportNames[airportId] || airportId;
+                const emoji = getWeatherEmoji(skyDesc);
+                
+                const airportInfo = document.createElement('div');
+                airportInfo.className = 'airport-info';
+                airportInfo.innerHTML = `
+                    <h3>${emoji} ${airportName} 공항</h3>
+                    <p><strong>날씨
