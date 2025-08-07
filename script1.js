@@ -30,7 +30,7 @@ async function getAirportWeather() {
     const serviceKey = "OEBU5anyrQkL0zi0N1vyjCpBIvoWBYDMB+orxAz7FsyOzDVxU0Bp1YgpSeVnkdfvcbUv2NbRV+O/AEY2mAvD8g==";
     const AIRPORT_IDS = ["RKSS", "RKSI", "RKNY", "RKTU", "RKPC", "RKPK", "RKJJ", "RKJB"];
     
-    const CORS_PROXY_URL = "https://cors-anywhere.herokuapp.com/";
+    const CORS_PROXY_URL = "https://cors-proxy.org/?";
     
     // 현재 날짜와 시간을 구하는 코드
     const now = new Date();
@@ -44,11 +44,11 @@ async function getAirportWeather() {
     const currentHour = now.getHours();
 
     if (currentHour >= 17) {
-        base_time = "1700"; 
+        base_time = "1700";
     } else if (currentHour >= 6) {
-        base_time = "0600"; 
+        base_time = "0600";
     } else {
-        now.setDate(now.getDate() - 1); // 날짜를 하루 전으로 변경
+        now.setDate(now.getDate() - 1);
         year = now.getFullYear();
         month = String(now.getMonth() + 1).padStart(2, '0');
         day = String(now.getDate()).padStart(2, '0');
@@ -61,7 +61,7 @@ async function getAirportWeather() {
 
     for (const airportId of AIRPORT_IDS) {
         const apiUrl = `http://apis.data.go.kr/1360000/MdeMdlService/getMdeMdl?serviceKey=${serviceKey}&base_date=${base_date}&base_time=${base_time}&airPortCd=${airportId}`;
-        const finalUrl = `${CORS_PROXY_URL}${apiUrl}`; 
+        const finalUrl = `${CORS_PROXY_URL}${encodeURIComponent(apiUrl)}`;
         
         try {
             const response = await fetch(finalUrl);
