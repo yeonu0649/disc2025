@@ -30,7 +30,7 @@ async function getAirportWeather() {
     const serviceKey = "OEBU5anyrQkL0zi0N1vyjCpBIvoWBYDMB+orxAz7FsyOzDVxU0Bp1YgpSeVnkdfvcbUv2NbRV+O/AEY2mAvD8g==";
     const AIRPORT_IDS = ["RKSS", "RKSI", "RKNY", "RKTU", "RKPC", "RKPK", "RKJJ", "RKJB"];
     
-    const CORS_PROXY_URL = "http://localhost:8080/";
+    const CORS_PROXY_URL = "https://corsproxy.io/?";
     
     const now = new Date();
     let year = now.getFullYear();
@@ -59,7 +59,7 @@ async function getAirportWeather() {
 
     for (const airportId of AIRPORT_IDS) {
         const apiUrl = `http://apis.data.go.kr/1360000/MdeMdlService/getMdeMdl?serviceKey=${serviceKey}&base_date=${base_date}&base_time=${base_time}&airPortCd=${airportId}`;
-        const finalUrl = `${CORS_PROXY_URL}${apiUrl}`;
+        const finalUrl = `${CORS_PROXY_URL}${encodeURIComponent(apiUrl)}`;
         
         try {
             const response = await fetch(finalUrl);
@@ -107,7 +107,6 @@ async function getAirportWeather() {
 }
 
 getAirportWeather();
-
 
 
 
