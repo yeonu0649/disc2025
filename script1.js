@@ -29,16 +29,16 @@ const airportNames = {
 async function getAirportWeather() {
     const serviceKey = "OEBU5anyrQkL0zi0N1vyjCpBIvoWBYDMB+orxAz7FsyOzDVxU0Bp1YgpSeVnkdfvcbUv2NbRV+O/AEY2mAvD8g==";
     const AIRPORT_IDS = ["RKSS", "RKSI", "RKNY", "RKTU", "RKPC", "RKPK", "RKJJ", "RKJB"];
-
+    
     // 안정적인 공용 프록시 서버 주소로 변경했습니다.
     const CORS_PROXY_URL = "https://corsproxy.io/?";
-
+    
     const now = new Date();
     let year = now.getFullYear();
     let month = String(now.getMonth() + 1).padStart(2, '0');
     let day = String(now.getDate()).padStart(2, '0');
     let base_date = `${year}${month}${day}`;
-
+    
     let base_time;
     const currentHour = now.getHours();
 
@@ -61,24 +61,21 @@ async function getAirportWeather() {
     for (const airportId of AIRPORT_IDS) {
         const apiUrl = `http://apis.data.go.kr/1360000/MdeMdlService/getMdeMdl?serviceKey=${encodeURIComponent(serviceKey)}&base_date=${base_date}&base_time=${base_time}&airPortCd=${airportId}`;
         const finalUrl = `${CORS_PROXY_URL}${encodeURIComponent(apiUrl)}`;
-
+        
         try {
             const response = await fetch(finalUrl);
-            const xmlText = await response.text();
+            const data = await response.json(); // XML 대신 JSON으로 파싱
 
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(xmlText, "text/xml");
-
-            const item = xmlDoc.querySelector("item");
+            const item = data.response.body.items.item[0]; // JSON 경로에 맞게 수정
             if (item) {
-                const skyDesc = item.querySelector("skyDesc")?.textContent || "N/A";
-                const temp = item.querySelector("temp")?.textContent || "N/A";
-                const windDir = item.querySelector("windDir")?.textContent || "N/A";
-                const windSpd = item.querySelector("windSpd")?.textContent || "N/A";
+                const skyDesc = item.summary || "N/A"; // summary 필드 사용
+                const temp = item.sel_val1 || "N/A"; // sel_val1 필드 사용 (온도 정보가 여기에 포함되어 있을 가능성)
+                const windDir = "N/A"; // 현재 데이터에 없음
+                const windSpd = "N/A"; // 현재 데이터에 없음
 
                 const airportName = airportNames[airportId] || airportId;
                 const emoji = getWeatherEmoji(skyDesc);
-
+                
                 const airportInfo = document.createElement('div');
                 airportInfo.className = 'airport-info';
                 airportInfo.innerHTML = `
@@ -108,3 +105,4 @@ async function getAirportWeather() {
 }
 
 getAirportWeather();
+
