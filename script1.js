@@ -30,8 +30,8 @@ async function getAirportWeather() {
     const serviceKey = "OEBU5anyrQkL0zi0N1vyjCpBIvoWBYDMB+orxAz7FsyOzDVxU0Bp1YgpSeVnkdfvcbUv2NbRV+O/AEY2mAvD8g==";
     const AIRPORT_IDS = ["RKSS", "RKSI", "RKNY", "RKTU", "RKPC", "RKPK", "RKJJ", "RKJB"];
     
-    // 안정적인 공용 프록시 서버 주소로 변경했습니다.
-    const CORS_PROXY_URL = "https://corsproxy.io/?";
+    // 최종적으로 안정적인 프록시 서버를 사용하도록 변경했습니다.
+    const CORS_PROXY_URL = "https://api.allorigins.win/get?url=";
     
     const now = new Date();
     let year = now.getFullYear();
@@ -59,19 +59,24 @@ async function getAirportWeather() {
     weatherDiv.innerHTML = '<h2>✈️ 국내 주요 공항 기상 정보</h2>';
 
     for (const airportId of AIRPORT_IDS) {
-        const apiUrl = `http://apis.data.go.kr/1360000/MdeMdlService/getMdeMdl?serviceKey=${encodeURIComponent(serviceKey)}&base_date=${base_date}&base_time=${base_time}&airPortCd=${airportId}`;
+
+        const apiUrl = `http://apis.data.go.kr/1360000/AirPortService/getAirPort?serviceKey=${encodeURIComponent(serviceKey)}&base_date=${base_date}&base_time=${base_time}&airPortCd=${airportId}&dataType=json`;
         const finalUrl = `${CORS_PROXY_URL}${encodeURIComponent(apiUrl)}`;
         
         try {
             const response = await fetch(finalUrl);
-            const data = await response.json(); // XML 대신 JSON으로 파싱
+            const result = await response.json(); 
+            const data = JSON.parse(result.contents); 
 
-            const item = data.response.body.items.item[0]; // JSON 경로에 맞게 수정
-            if (item) {
-                const skyDesc = item.summary || "N/A"; // summary 필드 사용
-                const temp = item.sel_val1 || "N/A"; // sel_val1 필드 사용 (온도 정보가 여기에 포함되어 있을 가능성)
-                const windDir = "N/A"; // 현재 데이터에 없음
-                const windSpd = "N/A"; // 현재 데이터에 없음
+            // API 응답 구조가 변경되어 item[0] 대신 item 배열을 직접 순회하도록 수정
+            const items = data.response.body.items.item;
+            if (items && items.length > 0) {
+                // 첫 번째 item의 데이터를 사용
+                const item = items[0];
+                const skyDesc = item.skyDesc || "N/A";
+                const temp = item.temp || "N/A";
+                const windDir = item.windDir || "N/A";
+                const windSpd = item.windSpd || "N/A";
 
                 const airportName = airportNames[airportId] || airportId;
                 const emoji = getWeatherEmoji(skyDesc);
@@ -105,4 +110,3 @@ async function getAirportWeather() {
 }
 
 getAirportWeather();
-
