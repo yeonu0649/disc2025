@@ -57,26 +57,28 @@ async function getAirportWeather() {
     weatherDiv.innerHTML = '<h2>✈️ 국내 주요 공항 기상 정보</h2>';
 
     for (const airportId of AIRPORT_IDS) {
-        
         const apiUrl = `https://apis.data.go.kr/1360000/AirPortService/getAirPort?serviceKey=${encodeURIComponent(serviceKey)}&base_date=${base_date}&base_time=${base_time}&airPortCd=${airportId}&dataType=json`;
         
         try {
             const response = await fetch(apiUrl);
             
-            // `response.ok`를 통해 응답 성공 여부를 먼저 확인합니다.
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             const data = await response.json();
             
-            // JSON 데이터 구조에 맞게 변경
             const item = data.response?.body?.items?.item[0];
             if (item) {
-                const skyDesc = item.skyDesc || "N/A";
-                const temp = item.temp || "N/A";
-                const windDir = item.windDir || "N/A";
-                const windSpd = item.windSpd || "N/A";
+                // 교수님께서 보내주신 JSON 데이터 필드에 맞게 수정
+                const skyDesc = item.summary || "N/A";
+                const tempText = item.sel_val1 || "N/A";
+                const tempMatch = tempText.match(/\d+/);
+                const temp = tempMatch ? tempMatch[0] : "N/A";
+                
+                // 해당 데이터는 API에 존재하지 않아 '정보 없음'으로 표시
+                const windDir = "정보 없음";
+                const windSpd = "정보 없음";
 
                 const airportName = airportNames[airportId] || airportId;
                 const emoji = getWeatherEmoji(skyDesc);
@@ -88,7 +90,7 @@ async function getAirportWeather() {
                     <p><strong>날씨:</strong> ${skyDesc}</p>
                     <p><strong>온도:</strong> ${temp}°C</p>
                     <p><strong>풍향:</strong> ${windDir}</p>
-                    <p><strong>풍속:</strong> ${windSpd} m/s</p>
+                    <p><strong>풍속:</strong> ${windSpd}</p>
                 `;
                 weatherDiv.appendChild(airportInfo);
             } else {
@@ -118,4 +120,3 @@ async function getAirportWeather() {
 }
 
 getAirportWeather();
-
