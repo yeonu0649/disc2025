@@ -30,8 +30,6 @@ async function getAirportWeather() {
     const serviceKey = "OEBU5anyrQkL0zi0N1vyjCpBIvoWBYDMB+orxAz7FsyOzDVxU0Bp1YgpSeVnkdfvcbUv2NbRV+O/AEY2mAvD8g==";
     const AIRPORT_IDS = ["RKSS", "RKSI", "RKNY", "RKTU", "RKPC", "RKPK", "RKJJ", "RKJB"];
     
-    // 최종적으로 안정적인 프록시 서버를 사용하도록 변경했습니다.
-    const CORS_PROXY_URL = "https://api.allorigins.win/get?url=";
     
     const now = new Date();
     let year = now.getFullYear();
@@ -59,20 +57,22 @@ async function getAirportWeather() {
     weatherDiv.innerHTML = '<h2>✈️ 국내 주요 공항 기상 정보</h2>';
 
     for (const airportId of AIRPORT_IDS) {
-
-        const apiUrl = `http://apis.data.go.kr/1360000/AirPortService/getAirPort?serviceKey=${encodeURIComponent(serviceKey)}&base_date=${base_date}&base_time=${base_time}&airPortCd=${airportId}&dataType=json`;
-        const finalUrl = `${CORS_PROXY_URL}${encodeURIComponent(apiUrl)}`;
+        
+        const apiUrl = `https://apis.data.go.kr/1360000/AirPortService/getAirPort?serviceKey=${encodeURIComponent(serviceKey)}&base_date=${base_date}&base_time=${base_time}&airPortCd=${airportId}&dataType=json`;
         
         try {
-            const response = await fetch(finalUrl);
-            const result = await response.json(); 
-            const data = JSON.parse(result.contents); 
+            const response = await fetch(apiUrl);
+            
+            // `response.ok`를 통해 응답 성공 여부를 먼저 확인합니다.
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
-            // API 응답 구조가 변경되어 item[0] 대신 item 배열을 직접 순회하도록 수정
-            const items = data.response.body.items.item;
-            if (items && items.length > 0) {
-                // 첫 번째 item의 데이터를 사용
-                const item = items[0];
+            const data = await response.json();
+            
+            // JSON 데이터 구조에 맞게 변경
+            const item = data.response?.body?.items?.item[0];
+            if (item) {
                 const skyDesc = item.skyDesc || "N/A";
                 const temp = item.temp || "N/A";
                 const windDir = item.windDir || "N/A";
@@ -93,6 +93,14 @@ async function getAirportWeather() {
                 weatherDiv.appendChild(airportInfo);
             } else {
                 console.error(`Error: item not found for ${airportId}`);
+                const airportName = airportNames[airportId] || airportId;
+                const errorInfo = document.createElement('div');
+                errorInfo.className = 'airport-info';
+                errorInfo.innerHTML = `
+                    <h3>❓ ${airportName} 공항</h3>
+                    <p>데이터 정보 없음</p>
+                `;
+                weatherDiv.appendChild(errorInfo);
             }
 
         } catch (error) {
@@ -110,3 +118,4 @@ async function getAirportWeather() {
 }
 
 getAirportWeather();
+
