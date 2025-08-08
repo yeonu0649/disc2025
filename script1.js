@@ -1,3 +1,4 @@
+console.log("스크립트 시작!"); 
 // 날씨 상태에 따라 이모티콘을 반환하는 함수
 function getWeatherEmoji(skyDesc) {
     if (skyDesc.includes("맑음")) {
@@ -107,6 +108,7 @@ async function getAirportWeather() {
 }
 
 getAirportWeather();
+
 
 
 
